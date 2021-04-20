@@ -1,0 +1,18 @@
+LL-VM
+
+Low Level - Virtual Machine
+.net Framework
+CLI (Command language Interface)
+
+//GameProgramming Patterns
+
+//Physically Based Rendering
+
+
+アプリケーションをダブルクリックで起動
+アプリケーションを動かしているのはプログラム…ではなく
+ウィンドウを開いてるのは『OS』です
+
+アプリケーションはWindowsに対して「こういうウィンドウを作って開いてください」とお伺いを立てているだけ
+
+今回、main関数がありますが、これを呼び出しているのがOSです
