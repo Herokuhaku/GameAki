@@ -18,3 +18,5 @@ CLI (Command language Interface)
 今回、main関数がありますが、これを呼び出しているのがOSです
 
 github は直接サイトから変更できます
+
+君のとりこになってしまえばきっと
