@@ -10,6 +10,8 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
         return -1;
     }
 
+    SetDrawScreen(DX_SCREEN_BACK);
+
     while (!ProcessMessage() && !CheckHitKey(KEY_INPUT_ESCAPE)) {
         ClsDrawScreen();
         
