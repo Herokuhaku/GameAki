@@ -1,11 +1,14 @@
 #include <DxLib.h>	// 自分で作ったもの→"" ;  
+#include <array>    // std::の配列
+#include <cassert>
+#include "_Debug.h"
 
 struct Vector2 {
     float x, y;
 };
 
 using Position2 = Vector2;
-
+using KeyBoardData = std::array<char, 256>;
 struct Rect{
     Position2 center;
     float w;    // weight /2
@@ -31,9 +34,30 @@ struct Rect{
     }
 };
 
+void MoveByInput(Position2 & pos ,const KeyBoardData& keystate)
+{
+    constexpr float speed = 4.0f;
+    if (keystate[KEY_INPUT_LEFT])
+    {
+        pos.x -= speed;
+    }
+    if (keystate[KEY_INPUT_RIGHT])
+    {
+        pos.x += speed;
+    }
+    if (keystate[KEY_INPUT_UP])
+    {
+        pos.y -= speed;
+    }
+    if (keystate[KEY_INPUT_DOWN])
+    {
+        pos.y += speed;
+    }
+}
+
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd){
     ChangeWindowMode(TRUE);// Windowモードで起動
-    SetMainWindowText("MyGame");//ウィンドウタイトルを変更
+    SetMainWindowText(TEXT("MyGame"));//ウィンドウタイトルを変更
     SetGraphMode(640, 480, 16);// 画面解像度と色数の設定
 
     if (DxLib_Init() == -1) {
@@ -44,30 +68,22 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
     SetDrawScreen(DX_SCREEN_BACK);
 
     Rect rcA = {100,100,50,50};
-    char keystate[256];
+    KeyBoardData keystate;
 
-    constexpr float speed = 4.0f;
     while (!ProcessMessage() && !CheckHitKey(KEY_INPUT_ESCAPE)) {
         ClsDrawScreen();
-        GetHitKeyStateAll(keystate);
 
-        if (keystate[KEY_INPUT_LEFT])
-        {
-            rcA.center.x -= speed;
-        }
-        if (keystate[KEY_INPUT_RIGHT])
-        {
-            rcA.center.x += speed;
-        }
-        if (keystate[KEY_INPUT_UP])
-        {
-            rcA.center.y -= speed;
-        }
-        if (keystate[KEY_INPUT_DOWN])
-        {
-            rcA.center.y += speed;
-        }
+        GetHitKeyStateAll(keystate.data());
+        
+        MoveByInput(rcA.center,keystate);
+
         DrawBox(rcA.Left(),rcA.Top(),rcA.Right(),rcA.Bottom(),0xffffff,true);
+       
+        Debug::OutLine(16);
+        Debug::OutLine(static_cast<float>(16.555));
+        Debug::OutLine("Debug Out");
+        Debug::OutLine(L"Debug WOut");
+        
         ScreenFlip();
     }
 
