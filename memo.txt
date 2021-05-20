@@ -16,5 +16,3 @@ CLI (Command language Interface)
 アプリケーションはWindowsに対して「こういうウィンドウを作って開いてください」とお伺いを立てているだけ
 
 今回、main関数がありますが、これを呼び出しているのがOSです
-
-github は直接サイトから変更できます
