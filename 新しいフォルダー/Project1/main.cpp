@@ -67,9 +67,17 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 
     SetDrawScreen(DX_SCREEN_BACK);
 
+    int image_[6] = {};
     Rect rcA = {100,100,50,50};
     KeyBoardData keystate;
+    for (int i = 0; i < 6; i++) {
+        wchar_t path[80];
+        wsprintf(path,L"Asset/Adventurer-1.5/Individual Sprites/adventurer-run-%02d.png", i);
+        image_[i] = LoadGraph(path);
+        assert(image_[i] != -1);
+    }
 
+    unsigned int frameNo = 0;
     while (!ProcessMessage() && !CheckHitKey(KEY_INPUT_ESCAPE)) {
         ClsDrawScreen();
 
@@ -79,12 +87,15 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 
         DrawBox(rcA.Left(),rcA.Top(),rcA.Right(),rcA.Bottom(),0xffffff,true);
        
+
+        DrawRotaGraph(rcA.center.x,rcA.center.y,3.0f,0.0f,image_[frameNo/10],true);
         Debug::OutLine(16);
         Debug::OutLine(static_cast<float>(16.555));
         Debug::OutLine("Debug Out");
         Debug::OutLine(L"Debug WOut");
         
         ScreenFlip();
+        frameNo = (frameNo + 1) % 60;
     }
 
     DxLib_End();// ‚c‚wƒ‰ƒCƒuƒ‰ƒŠI—¹
