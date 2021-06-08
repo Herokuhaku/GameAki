@@ -2,6 +2,7 @@
 #include <array>    // std::‚Ì”z—ñ
 #include <cassert>
 #include "_Debug.h"
+#include "Singleton.h"
 
 struct Vector2 {
     float x, y;
@@ -89,11 +90,14 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
        
 
         DrawRotaGraph(rcA.center.x,rcA.center.y,3.0f,0.0f,image_[frameNo/10],true);
-        Debug::OutLine(16);
-        Debug::OutLine(static_cast<float>(16.555));
-        Debug::OutLine("Debug Out");
-        Debug::OutLine(L"Debug WOut");
-        
+        //Debug::OutLine(16);
+        //Debug::OutLine(static_cast<float>(16.555));
+        //Debug::OutLine("Debug Out");
+        //Debug::OutLine(L"Debug WOut");
+        Singleton& single = Singleton::GetInstance();
+        single.OutputLife();
+
+
         ScreenFlip();
         frameNo = (frameNo + 1) % 60;
     }
