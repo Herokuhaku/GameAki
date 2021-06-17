@@ -126,21 +126,33 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 
 
         // ’n–Ê‚Ì•`‰æ
+        float sin_amp = 50.0f;
         constexpr int block_size = 32;
         float base_y = 240;
         auto count = 720 / block_size;
         float x = 0;
-        float y = base_y;
-        for (int i = 0; i < count; ++i) {
+        float y = sin_amp * sin(DegreeToRadian(frame_for_angle)) + base_y;
+        Position2 groundpos(x,y);
+
+        for (int i = 1; i <= count; ++i) {
             float nextx = i * block_size;
             float ang = DegreeToRadian(nextx * 0.5 + frame_for_angle);
-            float nexty = sin(ang) * 100 + base_y;
-            DrawLineAA(x,y,nextx,nexty,0xffffff,5.0f);
+            float nexty = sin(ang) * sin_amp;
+           
+            auto nextpos = groundpos + Vector2(block_size,nexty).Normalized() * block_size;
+            
+            //DrawLineAA(x,y,nextx,nexty,0xffffff,5.0f);
             //DrawModiGraph(x,y,nextx,nexty,nextx,nexty+block_size,x,y+block_size,groundH,true);
-            DrawRectModiGraph(x, y, nextx, nexty, nextx, nexty + block_size, x, y + block_size,48,0,16,16,bgAssetH, true);
+           // DrawRectModiGraph(x, y, nextx, nexty, nextx, nexty + block_size, x, y + block_size,48,0,16,16,bgAssetH, true);
+            DrawRectModiGraph(groundpos.x, groundpos.y, 
+                nextpos.x, nextpos.y,
+                nextpos.x, nextpos.y + block_size,
+                groundpos.x, groundpos.y + block_size,
+                48, 0, 16, 16, bgAssetH, true);
 
-            x = nextx;
-            y = nexty;
+            //x = nextx;
+            //y = nexty;
+            groundpos = nextpos;
         }
 
         DrawRotaGraph2(rcA.center.x, rcA.center.y,centerx,35, 4.0f,0.0f, image_[frameNo / frames_per_pict], true,isReverse);
