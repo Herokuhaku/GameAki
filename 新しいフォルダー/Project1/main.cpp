@@ -124,7 +124,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
             centerx = w - centerx;
         }
 
-
+        
         // 地面の描画
         float sin_amp = 50.0f;
         constexpr int block_size = 32;
@@ -132,27 +132,57 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
         auto count = 720 / block_size;
         float x = 0;
         float y = sin_amp * sin(DegreeToRadian(frame_for_angle)) + base_y;
-        Position2 groundpos(x,y);
-
+        Position2 currentpos(x,y);
+        Vector2 lastdelta90vec = Vector2{0.0f,0.0f};
+        Position2 lastDeltaVector2[2] = { {0.0f,0.0f},{0.0f,0.0f} };
         for (int i = 1; i <= count; ++i) {
+            // 元のxから伸ばす先の座標x
             float nextx = i * block_size;
+            // 回転先
             float ang = DegreeToRadian(nextx * 0.5 + frame_for_angle);
+            // 元のyから伸ばす先の座標y
             float nexty = sin(ang) * sin_amp;
-           
-            auto nextpos = groundpos + Vector2(block_size,nexty).Normalized() * block_size;
-            
-            //DrawLineAA(x,y,nextx,nexty,0xffffff,5.0f);
-            //DrawModiGraph(x,y,nextx,nexty,nextx,nexty+block_size,x,y+block_size,groundH,true);
-           // DrawRectModiGraph(x, y, nextx, nexty, nextx, nexty + block_size, x, y + block_size,48,0,16,16,bgAssetH, true);
-            DrawRectModiGraph(groundpos.x, groundpos.y, 
-                nextpos.x, nextpos.y,
-                nextpos.x, nextpos.y + block_size,
-                groundpos.x, groundpos.y + block_size,
-                48, 0, 16, 16, bgAssetH, true);
+            // xのブロックサイズに対して、yのベクトルの大きさ(正規化)
+            auto deltavec = Vector2(block_size,nexty).Normalized() * block_size;
+            // 地面の高さからベクトル分を足す
+            auto nextpos = currentpos + deltavec;
+
+            auto middlevec0 = deltavec;
+            auto middlevecR = deltavec.Rotated90();
+         if (!(lastdelta90vec == Vector2::Zero())) {
+                middlevecR = (middlevecR + lastDeltaVector2[0]).Normalized() * block_size;
+            }
+
+         auto middlevecL = lastDeltaVector2[1];
+         lastDeltaVector2[0] = deltavec.Rotated90();
+         if (!(lastdelta90vec == Vector2::Zero())) {
+             middlevecL = (middlevecL + lastdelta90vec).Normalized() * block_size;
+         }
+            //if (!(lastDeltaVector2[0] == Vector2(0.0f, 0.0f))) {
+            //    middlevec0 = (deltavec.Rotated90() + lastDeltaVector2[0]).Normalized() * block_size;
+            //}
+            //if (!(lastDeltaVector2[1] == Vector2(0.0f, 0.0f))) {
+            //    middlevec1 = (deltavec.Rotated90() + lastDeltaVector2[1]).Normalized() * block_size;
+            //}
+
+            lastDeltaVector2[1] = lastDeltaVector2[0];
+            lastDeltaVector2[0] = deltavec.Rotated90();
+
+        auto middleposL = currentpos + middlevecL;
+        auto middleposR = nextpos + middlevecR;
+
+        //auto rightpos = nextpos + deltavec.Rotated90();
+        //auto leftpos = currentpos + deltavec.Rotated90();
+
+        DrawRectModiGraph(currentpos.x, currentpos.y,
+        nextpos.x, nextpos.y,
+        middleposR.x, middleposR.y,
+        middleposL.x, middleposL.y,
+        48, 0, 16, 16, bgAssetH, true);
 
             //x = nextx;
             //y = nexty;
-            groundpos = nextpos;
+            currentpos = nextpos;
         }
 
         DrawRotaGraph2(rcA.center.x, rcA.center.y,centerx,35, 4.0f,0.0f, image_[frameNo / frames_per_pict], true,isReverse);

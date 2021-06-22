@@ -36,6 +36,11 @@ void Vector2::Rotate90()
 	x = -x;
 }
 
+Vector2 Vector2::Rotated90()const
+{
+	return Vector2(-y,x);
+}
+
 Vector2
 Vector2::operator*(float scale) {
 	return Vector2(x*scale, y*scale);

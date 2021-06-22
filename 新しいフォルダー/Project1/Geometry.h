@@ -30,12 +30,18 @@ struct Vector2 {
 	bool operator == (const Vector2& val)const;
 
 	void Rotate90();
+	Vector2 Rotated90()const;
+
+	static const Vector2 Zero() {
+		return Vector2(0.0f,0.0f);
+	}
 
 	Vector2 operator*(float scale);
 	Vector2 operator-() const{
 		return Vector2(-x, -y);
 	}
 };
+
 
 Vector2 operator+(const Vector2& va, const Vector2 vb);
 Vector2 operator-(const Vector2& va, const Vector2 vb);
