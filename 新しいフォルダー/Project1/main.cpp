@@ -89,6 +89,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
     }
     int groundH = LoadGraph(L"Asset/ground.png");
     int bgAssetH = LoadGraph(L"Asset/Assets.png");
+    int arrowH = LoadGraph(L"Asset/arrow.png");
     unsigned int frameNo = 0;
     constexpr size_t frames_per_pict = 5;
     int lastMouseInput = 0;
@@ -130,11 +131,12 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
         constexpr int block_size = 32;
         float base_y = 240;
         auto count = 720 / block_size;
-        float x = 0;
+        float x = 10;
         float y = sin_amp * sin(DegreeToRadian(frame_for_angle)) + base_y;
         Position2 currentpos(x,y);
         Vector2 lastdelta90vec = Vector2{0.0f,0.0f};
         Position2 lastDeltaVector2[2] = { {0.0f,0.0f},{0.0f,0.0f} };
+        Position2 lastpos = Vector2::ZERO;
         for (int i = 1; i <= count; ++i) {
             // 元のxから伸ばす先の座標x
             float nextx = i * block_size;
@@ -147,43 +149,59 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
             // 地面の高さからベクトル分を足す
             auto nextpos = currentpos + deltavec;
 
-            auto middlevec0 = deltavec;
+
+
             auto middlevecR = deltavec.Rotated90();
-         if (!(lastdelta90vec == Vector2::Zero())) {
+         if (!(lastDeltaVector2[0] == Vector2::ZERO)) {
                 middlevecR = (middlevecR + lastDeltaVector2[0]).Normalized() * block_size;
             }
 
-         auto middlevecL = lastDeltaVector2[1];
-         lastDeltaVector2[0] = deltavec.Rotated90();
-         if (!(lastdelta90vec == Vector2::Zero())) {
-             middlevecL = (middlevecL + lastdelta90vec).Normalized() * block_size;
+         auto middlevecL = lastDeltaVector2[0];
+         if (!(lastDeltaVector2[1] == Vector2::ZERO)) {
+             middlevecL = (middlevecL + lastDeltaVector2[1]).Normalized() * block_size;
          }
-            //if (!(lastDeltaVector2[0] == Vector2(0.0f, 0.0f))) {
-            //    middlevec0 = (deltavec.Rotated90() + lastDeltaVector2[0]).Normalized() * block_size;
-            //}
-            //if (!(lastDeltaVector2[1] == Vector2(0.0f, 0.0f))) {
-            //    middlevec1 = (deltavec.Rotated90() + lastDeltaVector2[1]).Normalized() * block_size;
-            //}
 
             lastDeltaVector2[1] = lastDeltaVector2[0];
             lastDeltaVector2[0] = deltavec.Rotated90();
 
-        auto middleposL = currentpos + middlevecL;
-        auto middleposR = nextpos + middlevecR;
+        auto middleposL = currentpos + middlevecL*2;
+        auto middleposR = nextpos + middlevecR*2;
 
-        //auto rightpos = nextpos + deltavec.Rotated90();
-        //auto leftpos = currentpos + deltavec.Rotated90();
-
-        DrawRectModiGraph(currentpos.x, currentpos.y,
-        nextpos.x, nextpos.y,
-        middleposR.x, middleposR.y,
-        middleposL.x, middleposL.y,
-        48, 0, 16, 16, bgAssetH, true);
-
-            //x = nextx;
-            //y = nexty;
-            currentpos = nextpos;
+        
+        if (lastpos != Vector2::ZERO) {
+            //auto rightpos = nextpos + middlevecR;
+            //auto leftpos = lastpos + middlevecL;
+            //DrawRectModiGraph(lastpos.x, lastpos.y,
+            //    currentpos.x, currentpos.y,
+            //    rightpos.x, rightpos.y,
+            //    leftpos.x, leftpos.y,
+            //    i*block_size, 0,block_size,64, arrowH, true);
+            auto rightpos = nextpos + middlevecR;
+            auto leftpos = lastpos + middlevecL;
+            DrawRectModiGraph(lastpos.x, lastpos.y,
+                currentpos.x, currentpos.y,
+                rightpos.x, rightpos.y,
+                leftpos.x, leftpos.y,
+                48, 0, 16, 16, bgAssetH, true);
         }
+        //DrawLineAA(lastpos.x, lastpos.y,
+        //    currentpos.x, currentpos.y, 0xffffff, 3.0f);
+
+        //DrawLineAA(//右辺
+        //    currentpos.x, currentpos.y, //始点
+        //    rightpos.x, rightpos.y, //終点
+        //    0xffffff, 2.0f);
+        //DrawLineAA(//左辺
+        //    currentpos.x, currentpos.y, //始点
+        //    leftpos.x, leftpos.y, //終点
+        //    0x8888ff, 2.0f);
+        
+        //x = nextx;
+            //y = nexty;
+        lastpos = currentpos;
+        currentpos = nextpos;
+        }
+
 
         DrawRotaGraph2(rcA.center.x, rcA.center.y,centerx,35, 4.0f,0.0f, image_[frameNo / frames_per_pict], true,isReverse);
 

@@ -35,7 +35,7 @@ struct Vector2 {
 	static const Vector2 Zero() {
 		return Vector2(0.0f,0.0f);
 	}
-
+	static const Vector2 ZERO;
 	Vector2 operator*(float scale);
 	Vector2 operator-() const{
 		return Vector2(-x, -y);
