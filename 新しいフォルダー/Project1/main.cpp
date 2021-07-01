@@ -129,13 +129,13 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
         // ’n–Ê‚Ì•`‰æ
         int arrW, arrH;
         GetGraphSize(arrowH,&arrW,&arrH);
-        constexpr size_t width = 800;
+        constexpr size_t width = 1000;
         float sin_amp = 50.0f;
         constexpr int block_size = 32;
         float base_y = 240;
         auto count = width / block_size;
         float weight = static_cast<float>(arrW) / static_cast<float>(width);
-        float x = 10;
+        float x = -100;
         float y = sin_amp * sin(DegreeToRadian(frame_for_angle)) + base_y;
         Position2 currentpos(x,y);
         Vector2 lastdelta90vec = Vector2{0.0f,0.0f};
@@ -179,7 +179,9 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
                 nextpos.x, nextpos.y,
                 middleposR.x, middleposR.y,
                 middleposL.x, middleposL.y,
-                i*block_size * weight, 0,block_size * weight,64, arrowH, true);
+                i*block_size * weight, 0,
+                block_size * weight,64,
+                arrowH, true);
             //auto rightpos = nextpos + middlevecR;
             //auto leftpos = lastpos + middlevecL;
             //DrawRectModiGraph(lastpos.x, lastpos.y,
