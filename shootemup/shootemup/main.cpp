@@ -1,5 +1,6 @@
 #include<DxLib.h>
 #include<cmath>
+#include <memory>
 #include"Geometry.h"
 
 ///当たり判定関数
@@ -11,6 +12,7 @@ bool IsHit(const Position2& posA, float radiusA, const Position2& posB,  float r
 	//当たり判定を実装してください
 	return false;
 }
+using namespace std;
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	ChangeWindowMode(true);
@@ -49,16 +51,20 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//適当に256個くらい作っとく
 	Bullet bullets[256];
 
+	Bullet homingShots[2];
 	Position2 enemypos(320,25);//敵座標
 	Position2 playerpos(320, 400);//自機座標
 
 	unsigned int frame = 0;//フレーム管理用
 
-	char keystate[256];
+	char keystate[256] = {};
+	char lastKeyState[256] = {};
+	bool isRightHomig = false;
 	bool isDebugMode = false;
 	int skyy = 0;
 	int skyy2 = 0;
 	int bgidx = 0;
+	constexpr float homing_shot_speed = 3.0f;
 	while (ProcessMessage() == 0) {
 		ClearDrawScreen();
 
@@ -91,6 +97,47 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}else if (keystate[KEY_INPUT_DOWN]) {
 			playerpos.y = min(480,playerpos.y+4);
 		}
+		if (keystate[KEY_INPUT_Z] && !lastKeyState[KEY_INPUT_Z]) {
+			DrawString(100, 100, "発射", 0x0);
+			for (auto& h : homingShots) {
+				if (!h.isActive) {
+					h.isActive = true;
+					h.pos = playerpos;
+					h.vel = { isRightHomig ?homing_shot_speed:-homing_shot_speed,0.0f };
+					isRightHomig = !isRightHomig;
+					break;
+				}
+			}
+
+		}
+
+		for (auto& hshot : homingShots) {
+			if (!hshot.isActive) {
+				continue;
+			}
+			hshot.pos += hshot.vel;
+			for (int i = 1; i < 5; ++i) {
+
+				auto tailPos = hshot.pos - hshot.vel*2 * static_cast<float>(i);	
+				auto thickness = static_cast<float>(6-i);
+				DrawLineAA(hshot.pos.x, hshot.pos.y, tailPos.x, tailPos.y, 0xff0000,thickness * 4.0f);
+			}
+			hshot.vel = (hshot.vel + (enemypos - playerpos).Normalized()).Normalized() * homing_shot_speed;
+			DrawCircleAA(hshot.pos.x,hshot.pos.y,5,16,0xff4444,true);
+
+			//弾を殺す
+			// 敵に当たった
+			if ((enemypos - hshot.pos).SQMagnitude() < 900.0f) {
+				hshot.isActive = false;
+			}
+			// 範囲外に出た
+			if (hshot.pos.x + 16 < 0 || hshot.pos.x - 16 > 640 ||
+				hshot.pos.y + 24 < 0 || hshot.pos.y - 24 > 480) {
+				hshot.isActive = false;
+			}
+		}
+
+		DrawCircleAA(enemypos.x,enemypos.y, 50.0f, 16, 0x00ff00, false, 3.0f);
 
 		int pidx = (frame/4 % 2)*5+3;
 		DrawRotaGraph(playerpos.x, playerpos.y, 2.0f, 0.0f, playerH[pidx], true);
@@ -152,6 +199,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 		++frame;
 		ScreenFlip();
+		copy(begin(keystate),end(keystate),begin(lastKeyState));
 	}
 
 	DxLib_End();
