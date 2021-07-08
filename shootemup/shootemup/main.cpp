@@ -17,6 +17,8 @@ using namespace std;
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	ChangeWindowMode(true);
 	SetMainWindowText("íeñãÇæÇÊÅ`");
+	
+	//SetUseASyncLoadFlag(true);
 	if (DxLib_Init() != 0) {
 		return -1;
 	}
@@ -51,7 +53,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//ìKìñÇ…256å¬Ç≠ÇÁÇ¢çÏÇ¡Ç∆Ç≠
 	Bullet bullets[256];
 
-	Bullet homingShots[2];
+	Bullet homingShots[256];
 	Position2 enemypos(320,25);//ìGç¿ïW
 	Position2 playerpos(320, 400);//é©ã@ç¿ïW
 
@@ -197,6 +199,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			//ìGÇÃñ{ëÃ(ìñÇΩÇËîªíË)
 			DrawCircle(enemypos.x, enemypos.y, 5, 0xffffff, false, 3);
 		}
+		auto dcall = GetDrawCallCount();
+		int fps = GetFPS();
+
+		DrawFormatString(10,70,0x0,"DrawCall = %d",dcall);
+		DrawFormatString(10, 90, 0x0, "fps = %d",fps);
+
 		++frame;
 		ScreenFlip();
 		copy(begin(keystate),end(keystate),begin(lastKeyState));
