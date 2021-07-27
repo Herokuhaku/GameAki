@@ -1,8 +1,8 @@
 #include<DxLib.h>
 #include<cmath>
 #include <memory>
-#include"Geometry.h"
-
+//#include"Geometry.h"
+#include "HomingShot.h"
 ///“–‚½‚è”»’èŠÖ”
 ///@param posA A‚ÌÀ•W
 ///@param radiusA A‚Ì”¼Œa
@@ -24,6 +24,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	}
 	SetDrawScreen(DX_SCREEN_BACK);
 
+	double nextdeltatime = GetNowCount();
 	//”wŒi—p
 	int bgH[4];
 	LoadDivGraph("img/bganim.png", 4, 4, 1, 256, 192, bgH);
@@ -38,11 +39,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	int enemyH[2];
 	LoadDivGraph("img/enemy.png", 2, 2, 1, 32, 32, enemyH);
 
-	struct Bullet {
-		Position2 pos;//À•W
-		Vector2 vel;//‘¬“x
-		bool isActive = false;//¶‚«‚Ä‚é‚©`H
-	};
+
 
 	//’e‚Ì”¼Œa
 	float bulletRadius = 5.0f;
@@ -53,7 +50,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//“K“–‚É256ŒÂ‚­‚ç‚¢ì‚Á‚Æ‚­
 	Bullet bullets[256];
 
-	Bullet homingShots[256];
+	HomingShot homingShots[32] = {};
 	Position2 enemypos(320,25);//“GÀ•W
 	Position2 playerpos(320, 400);//Ž©‹@À•W
 
@@ -101,13 +98,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 		if (keystate[KEY_INPUT_Z] && !lastKeyState[KEY_INPUT_Z]) {
 			DrawString(100, 100, "”­ŽË", 0x0);
+			int count = 0;
 			for (auto& h : homingShots) {
 				if (!h.isActive) {
 					h.isActive = true;
 					h.pos = playerpos;
-					h.vel = { isRightHomig ?homing_shot_speed:-homing_shot_speed,0.0f };
+					h.vel = {count%2==0 ?homing_shot_speed:-homing_shot_speed,5.0f };
+					h.vel.Normalize();
+					h.vel *= homing_shot_speed;
 					isRightHomig = !isRightHomig;
-					break;
+					if (++count > 1) {
+						break;
+					}
 				}
 			}
 
@@ -117,14 +119,28 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			if (!hshot.isActive) {
 				continue;
 			}
-			hshot.pos += hshot.vel;
-			for (int i = 1; i < 5; ++i) {
-
-				auto tailPos = hshot.pos - hshot.vel*2 * static_cast<float>(i);	
-				auto thickness = static_cast<float>(6-i);
-				DrawLineAA(hshot.pos.x, hshot.pos.y, tailPos.x, tailPos.y, 0xff0000,thickness * 4.0f);
+			if (frame % 2 == 0) {
+				hshot.trail.Update();
 			}
-			hshot.vel = (hshot.vel + (enemypos - playerpos).Normalized()).Normalized() * homing_shot_speed;
+			hshot.pos += hshot.vel;
+
+			hshot.trail.Draw();
+			//for (int i = 1; i < 5; ++i) {
+
+			//	auto tailPos = hshot.pos - hshot.vel*2 * static_cast<float>(i);	
+			//	auto thickness = static_cast<float>(6-i);
+			//	DrawLineAA(hshot.pos.x, hshot.pos.y, tailPos.x, tailPos.y, 0xff0000,thickness * 4.0f);
+			//}
+			//hshot.vel = (hshot.vel + (enemypos - hshot.pos).Normalized()).Normalized() * homing_shot_speed;
+			auto nVelocity = hshot.vel.Normalized();
+			auto nToEnemy = (enemypos - hshot.pos).Normalized();
+			auto dot = Dot(nVelocity,nToEnemy);
+			auto angle = acos(dot);
+			angle = std::fminf(angle,DX_PI_F / 48.0f);
+			float sign = Cross(nVelocity,nToEnemy) > 0.0f ?1.0f : -1.0f;
+			angle = atan2(hshot.vel.y, hshot.vel.x) + sign * angle;
+			hshot.vel = hshot.vel.Normalized() + Vector2(cos(angle),sin(angle))*homing_shot_speed;
+
 			DrawCircleAA(hshot.pos.x,hshot.pos.y,5,16,0xff4444,true);
 
 			//’e‚ðŽE‚·
@@ -208,6 +224,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		++frame;
 		ScreenFlip();
 		copy(begin(keystate),end(keystate),begin(lastKeyState));
+		nextdeltatime += 16.66;
+		// 1ƒtƒŒ[ƒ€‚ÌŒÀŠE’l 16.66ms (1•bŠÔ‚É60ƒtƒŒ[ƒ€‚Ìê‡) ‚æ‚è‚à‘‚­‚±‚±‚É“ž’B‚µ‚Ä‚¢‚½‚ç‚»‚Ì•ª‘Ò‚Â
+		if (nextdeltatime > GetNowCount()) {
+			WaitTimer(static_cast<int>(nextdeltatime) - GetNowCount());
+		}
 	}
 
 	DxLib_End();
