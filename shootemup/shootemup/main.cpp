@@ -107,6 +107,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 					h.vel.Normalize();
 					h.vel *= homing_shot_speed;
 					isRightHomig = !isRightHomig;
+					h.trail.Clear();
 					if (++count > 1) {
 						break;
 					}

@@ -10,6 +10,7 @@ public:
 	Trail(HomingShot& owner);
 	void Update(void);
 	void Draw(void);
+	void Clear(void);
 private:
 	HomingShot& owner_;
 	// À•W‚Ì—š—ğ
