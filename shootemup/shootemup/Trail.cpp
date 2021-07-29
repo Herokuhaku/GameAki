@@ -2,7 +2,7 @@
 #include "HomingShot.h"
 #include <DxLib.h>
 
-constexpr size_t history_limit = 32.0f;
+constexpr size_t history_limit = 48.0f;
 
 Trail::Trail(HomingShot& owner):owner_(owner)
 {
@@ -22,7 +22,7 @@ void Trail::Draw(void)
 	float thickness = 20.0f;
 	for (const auto& pos : history_) {
 		DrawLineAA(lastpos.x, lastpos.y, pos.x, pos.y, 0xffffff, thickness);
-		thickness *= 0.9;
+		thickness *= 0.95;
 		lastpos = pos;
 	}
 }

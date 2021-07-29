@@ -103,12 +103,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				if (!h.isActive) {
 					h.isActive = true;
 					h.pos = playerpos;
-					h.vel = {count%2==0 ?homing_shot_speed:-homing_shot_speed,5.0f };
+					h.vel = {count%2==0 ?homing_shot_speed*2:-homing_shot_speed*2,2.0f*count };
 					h.vel.Normalize();
 					h.vel *= homing_shot_speed;
 					isRightHomig = !isRightHomig;
 					h.trail.Clear();
-					if (++count > 1) {
+					if (++count > 5) {
 						break;
 					}
 				}
