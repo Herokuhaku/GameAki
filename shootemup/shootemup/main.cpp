@@ -38,7 +38,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	int enemyH[2];
 	LoadDivGraph("img/enemy.png", 2, 2, 1, 32, 32, enemyH);
-
+	int arrowH = LoadGraph("img/arrow.png");
 
 
 	//弾の半径
@@ -51,6 +51,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Bullet bullets[256];
 
 	HomingShot homingShots[32] = {};
+
+	for (auto& s : homingShots) {
+		s.trail.SetHandle(arrowH);
+	}
 	Position2 enemypos(320,25);//敵座標
 	Position2 playerpos(320, 400);//自機座標
 
@@ -83,7 +87,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		DrawExtendGraph(0, skyy2, 640, skyy2 + 480, sky2H, true);
 		DrawExtendGraph(0, skyy2 - 480, 640, skyy2, sky2H, true);
 
-
+		
 		//プレイヤー
 		if (keystate[KEY_INPUT_RIGHT]) {
 			playerpos.x = min(640,playerpos.x+4);
@@ -232,7 +236,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 	}
 
-	DxLib_End();
+	DxLib::DxLib_End();
 
 	return 0;
 }
