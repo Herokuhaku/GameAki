@@ -38,7 +38,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	int enemyH[2];
 	LoadDivGraph("img/enemy.png", 2, 2, 1, 32, 32, enemyH);
-	int arrowH = LoadGraph("img/arrow.png");
+	int arrowH = LoadGraph("img/arrow_short.png");
 
 
 	//’e‚Ì”¼Œa
@@ -105,19 +105,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			int count = 0;
 			for (auto& h : homingShots) {
 				if (!h.isActive) {
+					h.trail.Clear();
 					h.isActive = true;
 					h.pos = playerpos;
 					h.vel = {count%2==0 ?homing_shot_speed*2:-homing_shot_speed*2,2.0f*count };
 					h.vel.Normalize();
 					h.vel *= homing_shot_speed;
 					isRightHomig = !isRightHomig;
-					h.trail.Clear();
+					//h.trail.Clear();
 					if (++count > 5) {
 						break;
 					}
 				}
 			}
-
 		}
 
 		for (auto& hshot : homingShots) {

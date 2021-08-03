@@ -33,9 +33,10 @@ void Trail::Draw(void)
 		auto p3 = pos - (v * 16);
 		auto p4 = lastpos - (v * 16);
 
-		DrawRectModiGraph(p1.x,p1.y,p2.x,p2.y,p3.x,p3.y,p4.x,p4.y,u*256.0,div,div*256,64,handle_,true);
+		DrawRectModiGraph(p1.x,p1.y,p2.x,p2.y,p3.x,p3.y,p4.x,p4.y,u*256,0,div*256,64,handle_,true);
 		thickness *= 0.95;
 		lastpos = pos;
+		u+=div;
 	}
 }
 
